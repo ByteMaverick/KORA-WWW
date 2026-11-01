@@ -1,0 +1,36 @@
+{
+ "val_real": {
+  "rows": 5625,
+  "rows with a name renamed": 5620,
+  "names renamed per row (mean)": 5.868266666666667,
+  "rows whose question had a mention replaced": 4389
+ },
+ "val_invented": {
+  "rows": 5625,
+  "rows with a name renamed": 5620,
+  "names renamed per row (mean)": 5.868266666666667,
+  "rows whose question had a mention replaced": 4389
+ },
+ "val_random": {
+  "rows": 5625,
+  "rows with a name renamed": 5620,
+  "names renamed per row (mean)": 5.868266666666667,
+  "rows whose question had a mention replaced": 4389
+ },
+ "j1b": {
+  "rows": 112589,
+  "rows with a name renamed": 112509,
+  "names renamed per row (mean)": 7.791276234800913,
+  "rows whose question had a mention replaced": 97459
+ },
+ "j1h copies": {
+  "rows": 37530,
+  "rows with a name renamed": 37498,
+  "names renamed per row (mean)": 7.775166533439915,
+  "rows whose question had a mention replaced": 32621
+ },
+ "j1h": {
+  "rows": 150087,
+  "both labels dropped": 0
+ }
+}

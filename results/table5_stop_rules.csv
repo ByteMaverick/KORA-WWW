@@ -1,0 +1,43 @@
+backbone,dataset,system,stop,status,n,hit,f1
+Qwen3-30B-A3B-Instruct-2507,webqsp,KORA (LLM stop),llm,ok,1624,81.2,67.3
+Qwen3-30B-A3B-Instruct-2507,cwq,KORA (LLM stop),llm,ok,3487,64.1,50.8
+Qwen3-30B-A3B-Instruct-2507,grailqa,KORA (LLM stop),llm,ok,1000,76.8,70.9
+Qwen3-30B-A3B-Instruct-2507,metaqa,KORA (LLM stop),llm,ok,515,90.9,85.2
+Qwen3-30B-A3B-Instruct-2507,mean,KORA (LLM stop),llm,ok,,78.2,68.5
+Qwen3-30B-A3B-Instruct-2507,webqsp,KORA,estimator,ok,1624,81.8,71.9
+Qwen3-30B-A3B-Instruct-2507,cwq,KORA,estimator,ok,3487,66.7,57.7
+Qwen3-30B-A3B-Instruct-2507,grailqa,KORA,estimator,ok,1000,82.6,78.1
+Qwen3-30B-A3B-Instruct-2507,metaqa,KORA,estimator,ok,515,97.1,91.0
+Qwen3-30B-A3B-Instruct-2507,mean,KORA,estimator,ok,,82.0,74.7
+Qwen3-30B-A3B-Instruct-2507,webqsp,KORA (gold stop),gold,ok,1624,86.8,77.2
+Qwen3-30B-A3B-Instruct-2507,cwq,KORA (gold stop),gold,ok,3487,74.8,64.4
+Qwen3-30B-A3B-Instruct-2507,grailqa,KORA (gold stop),gold,ok,1000,90.6,86.1
+Qwen3-30B-A3B-Instruct-2507,metaqa,KORA (gold stop),gold,ok,515,95.1,90.2
+Qwen3-30B-A3B-Instruct-2507,mean,KORA (gold stop),gold,ok,,86.8,79.5
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen,KORA (LLM stop),llm,ok,1000,69.5,52.5
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen,KORA (LLM stop),llm,ok,1000,56.2,46.0
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen,KORA,estimator,ok,1000,79.6,72.2
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen,KORA,estimator,ok,1000,64.3,59.6
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen,KORA (gold stop),gold,ok,1000,89.1,82.3
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen,KORA (gold stop),gold,ok,1000,75.1,69.3
+Qwen3-4B,webqsp,KORA (LLM stop),llm,ok,1624,76.9,62.4
+Qwen3-4B,cwq,KORA (LLM stop),llm,ok,3487,47.3,31.9
+Qwen3-4B,grailqa,KORA (LLM stop),llm,ok,1000,72.3,66.1
+Qwen3-4B,metaqa,KORA (LLM stop),llm,ok,515,74.0,63.3
+Qwen3-4B,mean,KORA (LLM stop),llm,ok,,67.6,55.9
+Qwen3-4B,webqsp,KORA,estimator,ok,1624,79.4,69.1
+Qwen3-4B,cwq,KORA,estimator,ok,3487,59.3,49.6
+Qwen3-4B,grailqa,KORA,estimator,ok,1000,80.0,75.6
+Qwen3-4B,metaqa,KORA,estimator,ok,515,87.8,77.5
+Qwen3-4B,mean,KORA,estimator,ok,,76.6,68.0
+Qwen3-4B,webqsp,KORA (gold stop),gold,ok,1624,85.9,74.2
+Qwen3-4B,cwq,KORA (gold stop),gold,ok,3487,66.5,55.1
+Qwen3-4B,grailqa,KORA (gold stop),gold,ok,1000,88.8,83.7
+Qwen3-4B,metaqa,KORA (gold stop),gold,ok,515,84.7,76.0
+Qwen3-4B,mean,KORA (gold stop),gold,ok,,81.5,72.2
+Qwen3-4B,webqsp-unseen,KORA (LLM stop),llm,ok,1000,71.4,55.6
+Qwen3-4B,cwq-unseen,KORA (LLM stop),llm,ok,1000,51.7,41.4
+Qwen3-4B,webqsp-unseen,KORA,estimator,ok,1000,77.3,69.9
+Qwen3-4B,cwq-unseen,KORA,estimator,ok,1000,62.8,56.6
+Qwen3-4B,webqsp-unseen,KORA (gold stop),gold,ok,1000,88.0,79.8
+Qwen3-4B,cwq-unseen,KORA (gold stop),gold,ok,1000,67.9,61.4

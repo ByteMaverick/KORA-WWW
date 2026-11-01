@@ -1,0 +1,12 @@
+.superpowers/
+.env
+__pycache__/
+*.egg-info
+.pytest_cache/
+artifacts/
+checkpoints/
+*.ckpt
+*.safetensors
+unseen_builder/*.nt*
+baselines/kbbinder/upstream/data
+baselines/kbbinder/data

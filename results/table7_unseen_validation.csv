@@ -1,0 +1,8 @@
+check,webqsp,cwq,basis
+Sources dropped: query misses recorded answers,45,337,builder validation records
+Source answers unchanged after extension,"1,200/1,200","1,200/1,200",paper text
+Twin query returns exactly planted answers,"1,200/1,200","1,200/1,200",paper text
+Inserted triples with a real subject; cross-pair edges,0; 0,0; 0,paper text
+"Screened out (closed book, source ID); released","42/1,631; 0","24/2,408; 0",builder validation records
+"Val.–test overlap (twins, sources, texts, clones)",0,0,paper text
+"Closed-book Hits@Any, source→twin",53.9→4.2,34.3→3.1,table3_unseen.csv (Direct LLM)

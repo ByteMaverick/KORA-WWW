@@ -1,0 +1,22 @@
+backbone,dataset,metric,comparison,difference,ci_lo,ci_hi,n
+Qwen3-30B-A3B-Instruct-2507,mean of the four standard sets,hit,KORA minus SoG,+3.0,+1.9,+4.2,6626
+Qwen3-30B-A3B-Instruct-2507,mean of the four standard sets,f1,KORA minus SoG,+4.2,+3.0,+5.3,6626
+Qwen3-4B,mean of the four standard sets,hit,KORA minus SoG,+13.3,+11.7,+14.7,6626
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen-real,hit,ToG (estimator) minus ToG,+5.2,+1.8,+8.8,500
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen,hit,ToG (estimator) minus ToG,+34.4,+30.0,+38.6,500
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen-real,hit,ToG (estimator) minus ToG,+4.0,-0.4,+8.4,500
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen,hit,ToG (estimator) minus ToG,+30.4,+26.0,+35.2,500
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen-real,hit,PoG (estimator) minus PoG,+3.8,-0.6,+7.8,500
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen,hit,PoG (estimator) minus PoG,+4.2,+0.2,+8.2,500
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen-real,hit,PoG (estimator) minus PoG,+7.6,+2.6,+12.2,500
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen,hit,PoG (estimator) minus PoG,+7.4,+3.0,+11.6,500
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen-real,hit,CoR (estimator) minus CoR,-0.6,-4.0,+2.6,500
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen,hit,CoR (estimator) minus CoR,+34.8,+30.2,+39.4,500
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen-real,hit,CoR (estimator) minus CoR,+5.6,+1.0,+10.2,500
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen,hit,CoR (estimator) minus CoR,+29.6,+24.8,+34.4,500
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen-real,hit,KORA minus KORA (LLM stop),+2.6,-0.6,+5.8,500
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen,hit,KORA minus KORA (LLM stop),+9.6,+5.2,+13.8,500
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen-real,hit,KORA minus KORA (LLM stop),+5.0,+1.0,+9.2,500
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen,hit,KORA minus KORA (LLM stop),+8.8,+4.6,+13.0,500
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen,hit,KORA minus SoG,+5.7,+2.5,+8.9,1000
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen,hit,KORA minus SoG,+1.0,-2.6,+4.7,1000

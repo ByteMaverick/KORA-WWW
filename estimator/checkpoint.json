@@ -1,0 +1,26 @@
+{
+ "name": "j1h",
+ "threshold": 0.04942165136337313,
+ "max_len": 7999,
+ "encoder": "jhu-clsp/ettin-encoder-400m",
+ "input": "question, evidence",
+ "data": "A+B plus renamed copies of a third (invented names)",
+ "data_file": "estimator/data/train.parquet (the 126,026 non-BioCQ rows of the 150,087 the checkpoint was trained on)",
+ "rows": 150087,
+ "lr": 3e-05,
+ "epochs": 2,
+ "pooling": "cls",
+ "seed": 0,
+ "micro_tokens": 4096,
+ "validation": {
+  "n": 5625.0,
+  "FN rate": 0.07258064516129033,
+  "FP rate": 0.07296518074961189,
+  "precision": 0.7587976539589443,
+  "recall": 0.9274193548387096,
+  "F1": 0.8346774193548387,
+  "accuracy": 0.9271111111111111,
+  "AUROC": 0.9753560382222413
+ },
+ "minutes": 27.0
+}

@@ -1,0 +1,680 @@
+# Every prompt KORA renders, one section per prompt id (`<name>.<version>`).
+
+# The MetaQA graph's notes and relations, put into the query page; kora/tools/kg.py reads them as JSON.
+kg.metaqa_notes:
+  template: |
+    {{
+     "notes": [
+      "An entity's id is its name; there is no separate identifier and no entity linking, so a query names the entity directly, e.g. Kismet directed_by ?x.",
+      "A name with a space is written in double quotes, e.g. \"Black Like Me\" directed_by ?x.",
+      "Every node is a movie or a value of one of its attributes (person, year, language, tag, genre, votes, rating); every relation runs from the movie to the attribute."
+     ],
+     "relations": [
+      {{"relation": "DIRECTED_BY", "from": "movie", "to": "person", "edges": 0}},
+      {{"relation": "WRITTEN_BY", "from": "movie", "to": "person", "edges": 0}},
+      {{"relation": "STARRED_ACTORS", "from": "movie", "to": "person", "edges": 0}},
+      {{"relation": "RELEASE_YEAR", "from": "movie", "to": "year", "edges": 0}},
+      {{"relation": "IN_LANGUAGE", "from": "movie", "to": "language", "edges": 0}},
+      {{"relation": "HAS_TAGS", "from": "movie", "to": "tag", "edges": 0}},
+      {{"relation": "HAS_GENRE", "from": "movie", "to": "genre", "edges": 0}},
+      {{"relation": "HAS_IMDB_VOTES", "from": "movie", "to": "votes", "edges": 0}},
+      {{"relation": "HAS_IMDB_RATING", "from": "movie", "to": "rating", "edges": 0}}
+     ]
+    }}
+
+ner.extract:
+  system: |
+    You find the entities a question is about. You never answer the question and
+    you never guess identifiers -- naming a thing is your job, finding it in the
+    graph is someone else's.
+  template: |
+    Question: {question}
+    Knowledge graph: {kg}
+
+    Name the entities this question is anchored on: the specific people, places,
+    works, organisms or concepts a search would have to start from.
+
+    Anchors only. A question about films directed by someone is anchored on the
+    director, not on "films" and not on "directed". If the question mentions a
+    constraint that is itself a named thing -- a city, an award -- name that too.
+
+    Reply with JSON only:
+    {{"entities": [{{"mention": "...", "kind": "person|place|work|other"}}]}}
+
+planning.constraints:
+  system: |
+    You read a knowledge-graph question and write down its structure: the things it
+    refers to, the restrictions it states, and what the answer is. You do not answer
+    it, you do not plan how to look it up, and you do not name anything the question
+    does not name.
+
+    A VARIABLE is a thing the question refers to without naming. The answer is one.
+    So is every intermediate: "the movie Sebastian Warholm appeared in" is a
+    variable even though the question never says "film". Give each one a kind in
+    plain words.
+
+    A CONSTANT is a name the question states, exactly as written. Never the answer,
+    never a fuller form of a name, never something you happen to know.
+
+    A CONSTRAINT is one restriction the question makes, in the question's own words,
+    over the variables and constants it relates. One per restriction. A restriction
+    over three things ("held a position from a date") is one constraint with three
+    arguments, not two. No relation names, no queries, no identifiers, no steps.
+
+    The ANSWER names the variable that is asked for, its kind, the projection, and
+    how many the question wants (one, few, many). The projection is argmax or argmin
+    whenever the question contains a superlative (latest, most recent, first, last,
+    slowest, tallest, largest, smallest, least, most), whatever it applies to; the
+    key is the ordered property, always a variable with a constraint of its own.
+    It is count only for "how many" or "the number of". Otherwise it is identity.
+    A yes/no question has no answer variable: its constraints are the claim, and
+    type is boolean.
+
+    Every question has at least one constraint: even "who plays X" relates the
+    answer to X, and when the only restriction is the answer's kind ("how many
+    collectible items are there"), the kind is the constraint: {?x} is a
+    collectible item. "The latest", "the slowest", "the most recent", "the first"
+    are never a constraint: they are the projection (argmax or argmin), and the
+    property they order by is a variable with a constraint of its own. That holds
+    wherever the superlative sits: "who won the first tennis tournament where X
+    has a title" orders the tournament, not the champion, and the projection is
+    still argmin with the tournament's year as its key. "What", "which", "who"
+    ask for the things themselves (identity), however many there are; count is
+    only for "how many" or "the number of".
+
+    An OPERATION is how a restriction on a value is applied. Write it on the
+    constraint that states the restriction, in typed fields, so it can be run on
+    the graph's values; you never apply it yourself. A constraint that relates
+    things to each other ("{Drew Brees} attended {?university}") has no op. A
+    constraint with an op is never looked up as a relation, so the set it runs
+    over must come from another constraint: keep the relation that produces that
+    set as its own constraint.
+    - filter: keeps the things whose value passes a comparison with a value the
+      question states ("less than 31,290 undergraduates"). cmp is lt, le, gt, ge,
+      eq or ne; value is the stated value, a number without separators (31290)
+      or a date as YYYY-MM-DD, YYYY-MM or YYYY.
+    - argmax / argmin: a superlative's ordering, on the constraint that holds the
+      projection's key, and the same as the answer's projection.
+    - verify: a yes/no question's claim about a value ("completed before 1900"):
+      cmp and value as for a filter.
+    - about: the property compared or ordered, in the question's words
+      ("undergraduates", "area", "completed"). Never a relation name.
+    - over: the variable the operation runs over (the thing kept or picked, not
+      its value), or "named" when it runs over things the question names itself
+      ("which is larger, Tallinn or Vilnius": one constraint holds both names, and
+      the answer's key is the property in words).
+    "How many" is the projection count: no constraint carries an op for it. An
+    operation never relates its things to a named thing: "{?mayor} was the
+    mayor of {Lyon} in {1990}" is a relation, with no op. When a
+    restriction is not one of these, leave op null.
+
+    If you know the answer, that changes nothing: describe it, do not state it.
+    Reply with JSON only.
+
+    When the question asks for a property of something it names ("how tall is the
+    Eiffel Tower", "when did the Berlin Wall fall"), the property is the answer
+    variable and one constraint ties it to the thing: {Eiffel Tower} has height
+    {?height}. Declare only the variables your constraints use: every variable is
+    in the arguments of some constraint, and an intermediate is in two constraints
+    or shares one with another variable. Something the question mentions but never
+    restricts on its own (a relationship, an event, a position) is not a separate
+    variable: say it inside the constraint that relates the things around it.
+
+    When LEARNED FROM THE ATTEMPTS is filled in, you are writing a LOCAL PLAN for
+    one step whose first attempts failed on the graph: the step is the question to
+    write down, and the block says what the run holds and what the graph showed.
+    Keep every constraint it lists under "keep unchanged" exactly as written, same
+    id, same arguments, same words: they are the question's claims. Add what the
+    attempts show was missing (an intermediate, a time the question states, a
+    kind) and change the answer's projection and key if you must, but never name
+    a relation, and never a thing the question does not state.
+  template: |
+    WORKED EXAMPLES (other questions, written down; do not answer them)
+    {examples}
+
+    THE QUESTION TO WRITE DOWN
+    {question}
+
+    NAMES THE QUESTION STATES THAT ARE IN THE GRAPH (constants; use them as written; every name listed here is
+    something the question stands on, so each must appear in the arguments of at least one constraint)
+    {entities}
+
+    RELEVANT MEMORY
+    {memory}
+
+    LEARNED FROM THE ATTEMPTS (empty when this is the question's first plan)
+    {learned}
+
+    Reply:
+    {{"variables": {{"?x": "kind in plain words"}},
+      "constraints": [{{"id": "c1", "args": ["<constant or ?variable>", "..."],
+                       "says": "the restriction, in the question's words, with {{braces}} around every argument",
+                       "op": "null for a relation; filter|argmax|argmin|verify for a restriction on a value",
+                       "cmp": "filter and verify only: lt|le|gt|ge|eq|ne, else null",
+                       "value": "filter and verify only: the stated value, normalised, else null",
+                       "about": "with an op: the property, in the question's words, else null",
+                       "over": "with an op: the ?variable it runs over, or named, else null"}}],
+      "answer": {{"variable": "?x", "kind": "...", "projection": "argmax|argmin if the question has a superlative, count if it asks how many, else identity",
+                 "key": "for argmax/argmin: the ?variable holding the ordered property, or null",
+                 "count": "one|few|many", "type": "entity|value|boolean"}},
+      "rationale": "one sentence"}}
+
+    {complaint}
+
+planning.shapes:
+  examples:
+    - shape: conjunction
+      question: "What country bordering Lake Victoria has a capital called Nairobi?"
+      block: |
+        {"variables": {"?country": "a country"},
+         "constraints": [{"id": "c1", "args": ["Lake Victoria", "?country"], "says": "{?country} borders {Lake Victoria}"},
+                         {"id": "c2", "args": ["Nairobi", "?country"], "says": "{Nairobi} is the capital of {?country}"}],
+         "answer": {"variable": "?country", "kind": "country", "projection": "identity", "key": null, "count": "one", "type": "entity"}}
+    - shape: composition
+      question: "In the Sebastian Warholm movie, who had the role of Carl Fredricksen?"
+      block: |
+        {"variables": {"?film": "a film", "?actor": "a person"},
+         "constraints": [{"id": "c1", "args": ["Sebastian Warholm", "?film"], "says": "{Sebastian Warholm} appeared in {?film}"},
+                         {"id": "c2", "args": ["?actor", "?film", "Carl Fredricksen"], "says": "{?actor} played {Carl Fredricksen} in {?film}"}],
+         "answer": {"variable": "?actor", "kind": "person", "projection": "identity", "key": null, "count": "one", "type": "entity"}}
+    - shape: superlative
+      question: "What influencer of Whitman's poetry is the politician who began his governmental position latest?"
+      block: |
+        {"variables": {"?politician": "a politician", "?position": "a government position", "?date": "a date"},
+         "constraints": [{"id": "c1", "args": ["Whitman", "?politician"], "says": "{?politician} influenced the poetry of {Whitman}"},
+                         {"id": "c2", "args": ["?politician", "?position", "?date"], "says": "{?politician} began {?position} on {?date}",
+                          "op": "argmax", "about": "began a government position", "over": "?politician"}],
+         "answer": {"variable": "?politician", "kind": "politician", "projection": "argmax", "key": "?date", "count": "one", "type": "entity"}}
+    - shape: superlative on an intermediate
+      question: "Who won the first tennis tournament where Jim Osborne has a title?"
+      block: |
+        {"variables": {"?tournament": "a tennis tournament", "?year": "a year", "?champion": "a tennis player"},
+         "constraints": [{"id": "c1", "args": ["?tournament", "Jim Osborne"], "says": "{?tournament} is a tennis tournament where {Jim Osborne} has a title"},
+                         {"id": "c2", "args": ["?tournament", "?year"], "says": "{?tournament} was held in {?year}",
+                          "op": "argmin", "about": "year held", "over": "?tournament"},
+                         {"id": "c3", "args": ["?tournament", "?champion"], "says": "{?tournament} was won by {?champion}"}],
+         "answer": {"variable": "?champion", "kind": "tennis player", "projection": "argmin", "key": "?year", "count": "one", "type": "entity"}}
+    - shape: comparative
+      question: "What is the book with ISBN 0023895306 that was written by Aristotle?"
+      block: |
+        {"variables": {"?book": "a book"},
+         "constraints": [{"id": "c1", "args": ["Aristotle", "?book"], "says": "{?book} was written by {Aristotle}"},
+                         {"id": "c2", "args": ["?book", "0023895306"], "says": "{?book} has {0023895306} as its ISBN",
+                          "op": "filter", "cmp": "eq", "value": "0023895306", "about": "ISBN", "over": "?book"}],
+         "answer": {"variable": "?book", "kind": "book", "projection": "identity", "key": null, "count": "one", "type": "entity"}}
+    - shape: comparison of named things
+      question: "Of Tallinn and Vilnius, which city is home to more people?"
+      block: |
+        {"variables": {"?city": "a city"},
+         "constraints": [{"id": "c1", "args": ["?city", "Tallinn", "Vilnius"], "says": "{?city} is one of {Tallinn} and {Vilnius}",
+                          "op": "argmax", "about": "population", "over": "named"}],
+         "answer": {"variable": "?city", "kind": "city", "projection": "argmax", "key": "population", "count": "one", "type": "entity"}}
+    - shape: aggregation
+      question: "How many railway termini does the Northern Line have?"
+      block: |
+        {"variables": {"?terminus": "a railway terminus"},
+         "constraints": [{"id": "c1", "args": ["Northern Line", "?terminus"], "says": "{?terminus} is a terminus of the {Northern Line}"}],
+         "answer": {"variable": "?terminus", "kind": "railway terminus", "projection": "count", "key": null, "count": "many", "type": "entity"}}
+    - shape: boolean
+      question: "Was the Eiffel Tower completed before 1900?"
+      block: |
+        {"variables": {},
+         "constraints": [{"id": "c1", "args": ["Eiffel Tower", "1900"], "says": "{Eiffel Tower} was completed before {1900}",
+                          "op": "verify", "cmp": "lt", "value": "1900", "about": "completed", "over": "named"}],
+         "answer": {"variable": "", "kind": "", "projection": "identity", "key": null, "count": "one", "type": "boolean"}}
+
+query.explore:
+  system: |
+    You are the exploration step inside Kora's Query Agent. The queries for
+    this task have failed, so you are shown what actually surrounds the
+    entity in the graph and you choose from it. You never invent an
+    identifier: every id you return must appear in the list shown to you.
+  template: |
+    TASK GOAL
+    {goal}
+
+    EXPECTED OUTPUT
+    {kind}
+
+    WHAT SURROUNDS THE ENTITY (neighbourhood {hop} of at most {max_hops}).
+    Each line is one fact in the graph -- entity, relation, neighbour -- with
+    the neighbour's kind in brackets and its id in square brackets:
+    {listing}
+
+    CHOOSE FROM THIS LIST. Either name the neighbours that ARE the thing the
+    goal asks for -- as many as apply, by their [id] -- or, when the answer is
+    not on the list but one neighbour leads to it (an unnamed record that ties
+    the fact together, or the entity whose own neighbourhood would hold the
+    answer), name that one neighbour as the step. Name nothing when neither
+    applies.
+
+    Reply with JSON only:
+    {{"answers": ["id", ...], "step": "id or null", "reason": "one sentence"}}
+
+query.generate:
+  system: |
+    You are the structured-query generation component inside Kora's Query Agent.
+    You solve one concrete task, never the complete user question. You emit
+    query candidates only -- never prose, never an answer in natural language.
+    Obey the backend-specific record-property rules in the rendered task.
+  template: |
+    ORIGINAL QUESTION (context only -- do not try to answer it)
+    {question}
+
+    TASK GOAL
+    {goal}
+
+    EXPECTED OUTPUT
+    {expected_output}
+
+    GROUNDED INPUTS (the only entities you may name)
+    {entities}
+
+    REQUIREMENTS THIS TASK BEARS ON
+    {requirements}
+
+    LOCAL SCHEMA
+    {schema}
+
+    SEEDS -- the schema lines most likely to answer this goal, already written
+    as queries. They will run whether or not you copy them. Your job is to add
+    what they cannot express: a different relation you judge better, a second
+    hop, a :type constraint, an ORDER BY, a :key read. Each of your candidates
+    must differ from every seed and from each other.
+    {seeds}
+
+    WHAT PAST RUNS LEARNED ABOUT GRAPHS AND TASKS LIKE THIS
+    {memory}
+    {history}
+    WHAT THE LAST ATTEMPT CONCLUDED YOU SHOULD DO
+    {strategy}
+
+    Write exactly {k} candidate queries in this dialect:
+
+      SELECT ?var WHERE {{ subject predicate ?var . ?var predicate2 object }}
+
+    The dialect is triple patterns only. It is NOT SPARQL and NOT Cypher: no
+    FILTER, no OPTIONAL, no UNION, no PREFIX. Express every constraint as
+    another triple pattern. Three forms beyond plain patterns exist, below:
+    COUNT, a comparison, and a bound set.
+
+    COUNTING -- when the goal asks HOW MANY, select the count and nothing else:
+
+      SELECT COUNT(?x) WHERE {{ m.0yp3mmb rail.railway.terminuses ?x }}
+
+    It returns one row holding the number. Never count by listing. A counted
+    query never takes ORDER BY or LIMIT -- there is only the one row, nothing
+    to order or cut, and a query that combines them is rejected.
+
+    COMPARING -- "less than 279", "more than 1e+12", "after 2010": bind the
+    value with a pattern or a :key read, then compare it with one of
+    :lt :le :gt :ge. The bound is text from the question -- a bare number, or
+    a quoted date -- and never an anchor:
+
+      ?c meteorology.tropical_cyclone_category.max_wind_gust ?v . ?v :lt 279.0
+      ?mid :from ?d . ?d :ge "2010-01-01"
+
+    A BOUND SET -- when the page lists BOUND SETS, an earlier task already
+    produced the candidates. Start from the set, not from an anchor:
+
+      SELECT ?x WHERE {{ ?x :in @T0.1 . ?x music.recording.length ?v }} ORDER BY ?v ASC LIMIT 1
+
+    That is how a superlative over a set is asked: the set, the key per
+    member (one or two hops, or a :key read on a record), then ORDER BY the
+    key. Select the member, never the key.
+
+    ONE exception, for superlatives -- "the LAST time", "the FIRST", "the most
+    recent". After the closing brace you may write:
+
+      ORDER BY ?date DESC LIMIT 1
+
+    where ?date is a variable your WHERE binds to a date or a number. Bind it
+    with an explicit pattern allowed by the backend rules below, then order by it. DESC gives the latest or
+    largest, ASC the earliest or smallest. Never pair this with COUNT: a
+    counted query has one row and nothing to order or cut.
+
+    ONE RESERVED PREDICATE begins with a colon.
+
+      ?answer :type <a type from the schema>
+
+    `:type` says what kind of thing a variable must be. Use it on the variable
+    you are selecting whenever the schema tells you the type you want. It is
+    the difference between 500 rows and 53. The type strings are the ones
+    written in the schema above, copied exactly. A mediator record has a kind
+    too (`?mid :type <the record's type from the schema>`), written after its route.
+
+    BACKEND-SPECIFIC RECORD PROPERTY RULES
+    For a record property listed after `has`, `?mid :from ?date` reads its
+    value. `?mid :to none` keeps records without a `to` property. Use only
+    record keys explicitly listed by LOCAL SCHEMA.
+
+    READ THE SCHEMA BEFORE YOU WRITE ANYTHING.
+
+    Each line under PATTERNS FOR is a triple pattern you can use directly,
+    already oriented. It is COMPLETE: it already begins with the entity, so copy
+    it as it stands and rename the variable. Writing the entity again in front of
+    it -- `X X RELATION ?v` -- is the single most common way these queries fail. Some patterns put the anchor on the
+    right; that is deliberate, not a typo. Each line also tells you what is at
+    the far end:
+
+      m.0jcx EDUCATION_EDUCATION ?x   (4)   ?x is a MEDIATOR -- go through it, do not return it
+      m.0jcx PEOPLE_PLACE_LIVED ?x    (1)   ?x :type <a type from the schema>; e.g. Ulm (<a type from the schema>)
+
+    The "e.g." names are things the relation ACTUALLY reaches from this
+    entity, with their kind in brackets. They tell you what the relation is
+    about when its name does not: a relation whose examples are colours is
+    where the team's colours are, whatever it is called. Trust the examples
+    over the name, and never copy an example into a query.
+
+    Some lines say the relation is "mostly a MEDIATOR but also reaches" a
+    kind: that relation carries records AND named things. Use the ROUTES
+    block to go through its records; constrain `?x :type` to the kind when
+    the named thing is what you want.
+
+    A MEDIATOR IS NOT AN ANSWER. It is an unnamed record that ties several
+    things together -- a person, an institution, a degree and a year all hang
+    off one education record. If a line says MEDIATOR, the thing you want is one
+    step further, and the ROUTES block below already spells out how to get there:
+
+      ROUTES THROUGH A MEDIATOR (two steps, one fact):
+        m.0jcx EDUCATION_EDUCATION ?mid . ?mid EDUCATION_EDUCATION ?answer
+          -> <a type from the schema>   e.g. ETH Zurich   [?mid :type <the record's type from the schema>; record literal predicates are listed by LOCAL SCHEMA]
+
+    Copy a route verbatim when it leads to the type you want, rename ?answer to
+    your select variable, and add its type as a `:type` constraint. The bracket
+    at the end says what kind of record the middle is and which literal predicates
+    it carries; read them exactly as the backend-specific rules direct.
+    A query that selects the mediator returns unnamed records and is worthless.
+
+    Every query subject must be one of the grounded entities listed above as an
+    ANCHOR, or a variable your own query already bound. Never use an entity that
+    appears only as an example.
+
+    Do not perform entity linking and do not invent identifiers. If the task
+    needs an entity you were not given, you cannot write the query for it.
+
+    Use only predicates listed in the schema above, spelled exactly as shown.
+    Use entity identifiers, not names. An identifier that contains a space is
+    written in double quotes, exactly as the schema writes it
+    (`"Black Like Me" HAS_GENRE ?x`); without the quotes it reads as three
+    separate terms and the pattern is rejected. Separate triple patterns with " . ".
+    Every variable in SELECT must appear in the WHERE clause.
+
+    Write one triple pattern for each hop the task needs, and no more. Every
+    variable you introduce must either appear in SELECT or be needed to reach a
+    later pattern.
+
+    Select the variable that holds the thing asked for, not its name and not the
+    mediator that led to it.
+
+    The candidates must be structurally different from each other: a direct
+    relation, a path through an intermediate node, an alternative relation, a
+    different filtering shape. Four spellings of one query are one candidate.
+
+    Reply with JSON only:
+    {{"candidates": [
+      {{"id": "q1",
+        "query": "SELECT ?v WHERE {{ ... }}",
+        "rationale": "one sentence",
+        "output_variable": "?v",
+        "relations": ["..."]}}
+    ]}}
+
+query.judge:
+  template: |
+    Each block below is one candidate: its claims, the path that was traversed to reach it,
+    and its answer. Verify each candidate on its own evidence.
+
+    {candidates}
+
+    If more than one candidate's rows would answer the goal, name in "best" the one that answers it
+    most directly -- the relation the goal is about, not a neighbouring one.
+
+    Reply with JSON only. "candidates" below has one entry for each candidate above, each with
+    one entry for each of its claims: fill in every one and leave none out. "verdict" is one of
+    ESTABLISHED, NOT, NOT ADDRESSED; "why" is one line, naming only the evidence; "kind_ok" is
+    true or false; "doubt" is one line, or null.
+    {{"candidates": {reply},
+     "best": "the id of the candidate whose rows answer the goal most directly, or null"}}
+
+query.knowledge:
+  system: |
+    You check candidate answers to a question that was asked of a knowledge graph.
+
+    Each candidate is the result of one graph query. You are shown the query, how many entities it returned, and the names of the first few. Decide, from what you know about the world, whether a candidate's list is the right answer to the question.
+
+    A right list holds mostly correct answers, and most of the correct answers. A list is wrong when it answers a different question (where someone was born, when the question asks where they lived), when it is too broad (every film of an actor, when the question asks for one of them), when it leaves out most of the answer, or when it is the wrong kind of thing.
+
+    Entries written like m.0abc12 or PrimeKG:123 are records without a name. Judge a list by its named entries and by what its query asks for.
+  template: |
+    QUESTION: {question}
+    The answer should be: {kind}. The question expects {wanted}.
+
+    {candidates}
+
+    Reply with one line per candidate and nothing else, in this form:
+    1: correct=most covers=all
+    2: correct=none covers=none
+    "correct" is how much of the list is correct answers to the question. "covers" is how much of the full correct answer the list contains. Each is one of: none, few, half, most, all.
+
+reduction.property:
+  system: |
+    You choose which property of some knowledge-graph entities a restriction in
+    a question is about. You are given: the restriction in the question's own
+    words, how it compares (a threshold with a value, or "largest"/"smallest"
+    over the value), the kind of entity it applies to, and a numbered list of
+    the candidate properties those entities really have, each with its path,
+    one or two of its real values, and how many of the sampled entities have
+    it. You pick ONE candidate from the list, or say none. You never invent a
+    property and you never answer the question.
+
+    How to choose:
+    1. The values decide. The right property's values are the kind of thing the
+       restriction compares: a date (2004-04-30) for "after 2004", "most
+       recent", "earliest"; a number for "more than 1000", "capacity of 3401",
+       "tallest", "slowest"; a name for "called X". A candidate whose values
+       cannot be compared with the restriction's value is wrong, whatever its
+       name says.
+    2. Prefer the field that names the exact aspect over a container that
+       merely holds it. "ended" is the record's "to" or "end_date", not the
+       record itself and not "from". "started", "since", "appointed" are "from"
+       or "start_date". "opened" is "opened" or "established". "released" is a
+       release date; "first released" for earliest, "latest release" for most
+       recent.
+    3. Many quantities in this graph sit on a record one hop away whose fields
+       are literally "number" and "year" (a dated integer). Then the relation
+       that LEADS to the record names the quantity: size_of_armed_forces /
+       number for an army, number_of_undergraduates / number for
+       undergraduates, population / number for a population. Choose that path;
+       ignore the "year" field unless the restriction is about a year.
+    4. A plural container such as release_date_s or government_positions_held
+       is a list of records. The answer is a field inside it (release_date,
+       to), given as "container / field". Do not pick the container alone.
+    5. Match the kind of entity. For a TV program, running time is
+       episode_running_time, not a film's runtime. For a software, "released"
+       is first_released or latest_release_date, not a film's release date.
+    6. Superlatives: "latest", "most recent", "newest" = the largest date;
+       "earliest", "first", "oldest" = the smallest date; "tallest", "longest",
+       "largest", "most" = the largest number; "shortest", "slowest",
+       "smallest", "least", "fewest" = the smallest number. Pick the property;
+       the direction is applied for you.
+    7. If several candidates fit equally (two date fields on one record), prefer
+       the one whose name matches the restriction's word; if none of the
+       candidates' values fit, answer null. A null is better than a wrong path:
+       the system then falls back to its own search.
+    8. A candidate marked "memory" worked for a similar restriction before.
+       It is a hint, not an order: if its values do not fit rule 1, do not pick it.
+
+    Reply with JSON only: the path copied exactly from the list, and one line
+    naming the sample value that matches the restriction's value.
+  template: |
+    THE RESTRICTION (in the question's words)
+    {restriction}
+    compared as: {comparison}
+
+    THE ENTITIES IT APPLIES TO
+    {kind}; for example {members}
+
+    CANDIDATE PROPERTIES THESE ENTITIES HAVE
+    (number. path   e.g. sample values   (how many of the sampled entities have it)   memory?)
+    {candidates}
+
+    WORKED EXAMPLES (other restrictions, other entities)
+    - "ended governmental position, earliest" over people; candidates include
+      government_positions_held / government_position_held.from (e.g. 2003-01-06) and
+      government_positions_held / government_position_held.to (e.g. 2009-01-21):
+      pick the "to" path -- ended is the end date, and a date can be ordered.
+    - "released after 2004-04-30" over films; candidates include film.film.release_date_s (a list of records)
+      and film.film.release_date_s / film_regional_release_date.release_date (e.g. 2014-03-28):
+      pick the path with release_date -- a date to compare with 2004-04-30; the container alone has no date.
+    - "army of less than 5000" over countries; candidates include
+      location.statistical_region.size_of_armed_forces / measurement_unit.dated_integer.number (e.g. 2034) and
+      location.statistical_region.size_of_armed_forces / measurement_unit.dated_integer.year (e.g. 2010):
+      pick "number" -- 2034 is a size that compares with 5000; 2010 is a year.
+    - "capacity of 3401" over venues; candidates include architecture.venue.capacity (e.g. 4937) and
+      location.location.area (e.g. 1.2): pick capacity -- 4937 is a count of people like 3401.
+    - "shortest run time" over TV programs; candidates include tv.tv_program.episode_running_time (e.g. 22)
+      and tv.tv_program.number_of_episodes (e.g. 156): pick episode_running_time -- minutes, like a run time.
+    - "released latest" over software; candidates include computer.software.first_released (e.g. 1998-02-15)
+      and computer.software.latest_release_date (e.g. 2019-11-02): pick latest_release_date -- most recent asks
+      for the latest release.
+
+    Reply with JSON only:
+    {{"path": "one path copied exactly from the list, or null",
+      "why": "one line naming the sample value that matches the restriction's value"}}
+
+sufficiency.gold:
+  system: |
+    You judge one task of a knowledge-graph question-answering run, and you
+    are told the actual answer to the whole question. Decide whether what the
+    task produced settles the task -- or, for a step on the way, whether it
+    leads towards the answer. You reason from the answer; you never reveal
+    it. Your reason must not contain the answer or any part of it, and must
+    not name any entity that is not in the output shown to you.
+  template: |
+    ORIGINAL QUESTION
+    {question}
+
+    THE ACTUAL ANSWER TO THE QUESTION (known to you, never to be written in your reason)
+    {gold}
+
+    TARGET-TYPE GUIDANCE
+    {temporal_guidance}
+
+    THE TASK
+    {goal}
+
+    THIS TASK IS {role}
+
+    WHAT IT STARTED FROM
+    {inputs}
+
+    WHAT IT PRODUCED ({count} entities)
+    {output}
+
+    WHAT ITS CHILDREN PRODUCED (when it has children)
+    {children}
+
+    Decide:
+    - a FINAL task is settled only if what it produced is the answer: the
+      answer is in the output and the output is not a broad set the answer
+      happens to sit in (at least half of it should be the answer);
+    - a STEP is settled if what it produced is on the way to the answer:
+      the entity the answer hangs off, the record that ties it together,
+      the candidate set that contains it -- or, for a step that runs over one
+      candidate, a correct lookup for that candidate even when the candidate
+      is not the answer;
+    - if the task produced nothing useful, it is not settled.
+
+    Reply with JSON only:
+    {{"sufficient": true|false,
+      "reason": "one sentence that does not contain the answer",
+      "on_the_way": true|false}}
+
+sufficiency.knowledge:
+  system: |
+    You check candidate answers to a question that was asked of a knowledge graph.
+
+    Each candidate is the result of one graph query. You are shown the query, how many entities it returned, and the names of the first few. Decide, from what you know about the world, whether a candidate's list is the right answer to the question.
+
+    A right list holds mostly correct answers, and most of the correct answers. A list is wrong when it answers a different question (where someone was born, when the question asks where they lived), when it is too broad (every film of an actor, when the question asks for one of them), when it leaves out most of the answer, or when it is the wrong kind of thing.
+
+    Entries written like m.0abc12 or PrimeKG:123 are records without a name. Judge a list by its named entries and by what its query asks for.
+  template: |
+    QUESTION: {question}
+    The answer should be: {kind}. The question expects {wanted}.
+
+    CANDIDATE 1
+    query: {query}
+    returned {count}: {names}
+
+    Reply with one line per candidate and nothing else, in this form:
+    1: correct=most covers=all
+    2: correct=none covers=none
+    "correct" is how much of the list is correct answers to the question. "covers" is how much of the full correct answer the list contains. Each is one of: none, few, half, most, all.
+
+sufficiency.verify:
+  system: |
+    You verify whether evidence from a knowledge graph establishes a claim.
+    You are given claims (one per line, each a restriction the question makes,
+    with the candidate answer filled in), and the evidence: the path of
+    entities and relations that was actually traversed to reach the candidates.
+    For each claim say ESTABLISHED (the path shows it), NOT (the path shows
+    something else, or shows the claim is false), or NOT ADDRESSED (the path
+    says nothing about it), with one line of reason that names only what is in
+    the evidence.
+    The graph is the only source of truth. Never use your own knowledge: it can
+    never establish a claim the path does not show, it never supplies an answer,
+    it is never a reason to say NOT, and it is never a reason for doubt. NOT
+    means the path itself shows something else.
+    A path written A -[r1 / r2 / r3]-> S was traversed in that order: each
+    relation in the chain established its own step, even though only the final
+    set is listed. A claim about an intermediate step (the actors, the movies)
+    is ESTABLISHED by the chain that passes through it.
+    A list you are shown may be a sample: "and N more" means the rest exist and
+    are part of the same set. That is never a reason to say NOT.
+    Give a verdict for every claim id you were given, in the order given.
+    The heading of the candidate answer names the kind expected and how many
+    answers the question wants. kind_ok is true when the candidates are that kind
+    of thing and false when they are a different kind (countries where films are
+    expected, release formats where films are expected). A question that asks how
+    many is answered by a number, and a number is the right kind for it; a date
+    or a year answering "when" is the right kind too. When the question wants one
+    and the candidates are many, that alone is not a reason for NOT: some
+    questions have many answers (a city's postal codes, the languages of a
+    country). Judge the claims on the set shown, and say in doubt if the set looks
+    too broad for what the question asks.
+  template: |
+    CLAIMS
+    {claims}
+
+    EVIDENCE (the path that was traversed)
+    {path}
+
+    CANDIDATE ANSWER ({count} entities, kind expected: {kind}; the question wants {wanted_count})
+    {candidates}
+
+    Reply with JSON only. "claims" below has one entry for each claim id above: fill in
+    every one and leave none out. "verdict" is one of ESTABLISHED, NOT, NOT ADDRESSED;
+    "why" is one line, naming only the evidence.
+    {{"claims": {reply},
+      "kind_ok": true|false,
+      "doubt": "one line, or null"}}
+
+synthesis.phrase:
+  system: |
+    You write one sentence that states an answer a knowledge graph already gave.
+    Use only the names you are given. Never add a name, a fact or a number.
+    If something was not established, say the answer is partial.
+  template: |
+    ANSWER ({kind}, the question wants {count}; {projection})
+    {text}
+
+    NAMES YOU MAY USE
+    {names}
+
+    NOT ESTABLISHED
+    {unmet}
+
+    Reply with JSON only:
+    {{"sentence": "one sentence", "names": ["every name the sentence uses"]}}

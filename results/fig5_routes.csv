@@ -1,0 +1,21 @@
+backbone,dataset,system,stop,route,count,n,pct,tokens
+Qwen3-30B-A3B-Instruct-2507,webqsp,KORA,estimator,Direct query,1414,1624,87.1,11782
+Qwen3-30B-A3B-Instruct-2507,webqsp,KORA,estimator,Neighborhood search,15,1624,0.9,29251
+Qwen3-30B-A3B-Instruct-2507,webqsp,KORA,estimator,"Decomposed, accepted",15,1624,0.9,44589
+Qwen3-30B-A3B-Instruct-2507,webqsp,KORA,estimator,"Decomposed, not accepted",38,1624,2.3,66909
+Qwen3-30B-A3B-Instruct-2507,webqsp,KORA,estimator,"Not decomposed, not accepted",142,1624,8.7,30972
+Qwen3-30B-A3B-Instruct-2507,cwq,KORA,estimator,Direct query,2447,3487,70.2,16132
+Qwen3-30B-A3B-Instruct-2507,cwq,KORA,estimator,Neighborhood search,95,3487,2.7,28306
+Qwen3-30B-A3B-Instruct-2507,cwq,KORA,estimator,"Decomposed, accepted",413,3487,11.8,43049
+Qwen3-30B-A3B-Instruct-2507,cwq,KORA,estimator,"Decomposed, not accepted",426,3487,12.2,64759
+Qwen3-30B-A3B-Instruct-2507,cwq,KORA,estimator,"Not decomposed, not accepted",106,3487,3.0,25742
+Qwen3-30B-A3B-Instruct-2507,grailqa,KORA,estimator,Direct query,903,1000,90.3,8342
+Qwen3-30B-A3B-Instruct-2507,grailqa,KORA,estimator,Neighborhood search,12,1000,1.2,20732
+Qwen3-30B-A3B-Instruct-2507,grailqa,KORA,estimator,"Decomposed, accepted",19,1000,1.9,33286
+Qwen3-30B-A3B-Instruct-2507,grailqa,KORA,estimator,"Decomposed, not accepted",26,1000,2.6,60463
+Qwen3-30B-A3B-Instruct-2507,grailqa,KORA,estimator,"Not decomposed, not accepted",40,1000,4.0,20784
+Qwen3-30B-A3B-Instruct-2507,metaqa,KORA,estimator,Direct query,473,515,91.8,6414
+Qwen3-30B-A3B-Instruct-2507,metaqa,KORA,estimator,Neighborhood search,12,515,2.3,10438
+Qwen3-30B-A3B-Instruct-2507,metaqa,KORA,estimator,"Decomposed, accepted",12,515,2.3,20274
+Qwen3-30B-A3B-Instruct-2507,metaqa,KORA,estimator,"Decomposed, not accepted",12,515,2.3,26595
+Qwen3-30B-A3B-Instruct-2507,metaqa,KORA,estimator,"Not decomposed, not accepted",6,515,1.2,11838

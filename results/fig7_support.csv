@@ -1,0 +1,12 @@
+backbone,dataset,system,stop,n,correct_supported,correct_not_fully_supported,wrong_supported,wrong_not_fully_supported,no_answer,support
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen,KORA,estimator,1000,787,9,198,6,0,98.6
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen,SoG,native,1000,693,46,126,128,7,84.1
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen,KB-BINDER,,1000,626,16,114,12,232,96.4
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen,CoR,native,1000,355,56,198,170,221,74.6
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen,PoG,native,1000,340,300,103,214,43,46.4
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen,ToG,native,1000,134,94,21,747,4,15.6
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen,KORA,estimator,1000,636,7,349,8,0,98.5
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen,SoG,native,1000,575,58,151,204,12,73.8
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen,CoR,native,1000,262,38,322,143,235,78.2
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen,PoG,native,1000,341,82,158,342,77,54.1
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen,ToG,native,1000,120,37,56,780,7,17.7

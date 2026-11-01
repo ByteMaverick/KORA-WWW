@@ -1,0 +1,49 @@
+backbone,dataset,system,stop,status,n,hit,f1,support
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen-real,ToG,native,ok,500,71.8,50.7,38.1
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen,ToG,native,ok,500,22.0,17.3,15.7
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen-real,ToG,native,ok,500,43.2,37.4,38.6
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen,ToG,native,ok,500,16.4,14.6,18.9
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen-real,ToG (estimator),estimator,ok,500,77.0,53.4,52.2
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen,ToG (estimator),estimator,ok,500,56.4,44.2,52.6
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen-real,ToG (estimator),estimator,ok,500,47.2,40.3,59.0
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen,ToG (estimator),estimator,ok,500,46.8,43.6,62.0
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen-real,ToG (gold stop),gold,ok,500,80.4,57.9,43.4
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen,ToG (gold stop),gold,ok,500,59.2,48.1,38.0
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen-real,ToG (gold stop),gold,ok,500,58.4,51.0,45.1
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen,ToG (gold stop),gold,ok,500,54.4,49.9,48.0
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen-real,PoG,native,ok,500,70.6,50.2,36.4
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen,PoG,native,ok,500,67.0,47.2,46.6
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen-real,PoG,native,ok,500,45.8,39.2,33.7
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen,PoG,native,ok,500,44.4,37.6,59.1
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen-real,PoG (estimator),estimator,ok,500,74.4,62.0,95.0
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen,PoG (estimator),estimator,ok,500,71.2,60.2,91.6
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen-real,PoG (estimator),estimator,ok,500,53.4,46.2,91.9
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen,PoG (estimator),estimator,ok,500,51.8,45.7,86.7
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen-real,PoG (gold stop),gold,ok,500,73.8,67.0,83.1
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen,PoG (gold stop),gold,ok,500,69.0,65.6,77.3
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen-real,PoG (gold stop),gold,ok,500,57.8,54.3,73.0
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen,PoG (gold stop),gold,ok,500,62.8,60.1,68.8
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen-real,CoR,native,ok,500,81.4,69.9,85.5
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen,CoR,native,ok,500,41.0,35.3,73.7
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen-real,CoR,native,ok,500,51.0,45.2,60.4
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen,CoR,native,ok,500,29.4,25.8,79.8
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen-real,CoR (estimator),estimator,ok,500,80.8,73.5,89.9
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen,CoR (estimator),estimator,ok,500,75.8,71.5,94.0
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen-real,CoR (estimator),estimator,ok,500,56.6,47.5,81.6
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen,CoR (estimator),estimator,ok,500,59.0,54.2,95.9
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen-real,CoR (gold stop),gold,ok,500,88.0,83.0,86.9
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen,CoR (gold stop),gold,ok,500,86.0,82.5,90.0
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen-real,CoR (gold stop),gold,ok,500,62.4,56.1,67.3
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen,CoR (gold stop),gold,ok,500,73.8,69.7,88.2
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen-real,KORA (LLM stop),llm,ok,500,81.6,69.8,98.8
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen,KORA (LLM stop),llm,ok,500,70.4,53.0,98.5
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen-real,KORA (LLM stop),llm,ok,500,64.8,52.1,98.4
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen,KORA (LLM stop),llm,ok,500,58.6,48.4,98.0
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen-real,KORA,estimator,ok,500,84.2,75.5,98.7
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen,KORA,estimator,ok,500,80.0,73.0,98.5
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen-real,KORA,estimator,ok,500,69.8,60.9,98.7
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen,KORA,estimator,ok,500,67.4,61.6,99.0
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen-real,KORA (gold stop),gold,ok,500,89.6,81.1,99.0
+Qwen3-30B-A3B-Instruct-2507,webqsp-unseen,KORA (gold stop),gold,ok,500,90.2,83.8,98.8
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen-real,KORA (gold stop),gold,ok,500,75.6,66.3,98.5
+Qwen3-30B-A3B-Instruct-2507,cwq-unseen,KORA (gold stop),gold,ok,500,76.6,70.7,98.4

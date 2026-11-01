@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kora-www"
+version = "0.1.0"
+description = "KORA: knowledge-graph question answering with a learned stop policy (anonymous release)"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11"
+dependencies = ["pydantic>=2.0", "pyyaml>=6.0", "numpy", "openai>=1.0",
+                "tiktoken", "langchain-core", "langchain-openai", "requests", "neo4j"]
+
+[project.optional-dependencies]
+estimator = ["torch", "transformers>=5", "pandas", "pyarrow", "scikit-learn", "scipy", "matplotlib", "neo4j"]
+embed = ["sentence-transformers"]
+baselines = ["SPARQLWrapper", "sentence-transformers", "rank-bm25", "tqdm", "transformers", "neo4j"]  # ToG, PoG, CoR, SoG
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["kora*", "estimator*", "harness*", "baselines*", "unseen_builder*"]
+
+[tool.setuptools.package-data]
+kora = ["prompts/prompts.yaml"]
+harness = ["metrics/common/extract_prompt.md"]
+baselines = ["*/UPSTREAM.md", "*/upstream/*", "sog/examples_extra.json", "cor/chain_of_relations/**/*.yml"]
